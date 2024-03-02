@@ -21,7 +21,6 @@ export const getauthUser: RequestHandler = async (req, res, next) => {
       username:user?.username,
       reg_seller:user?.reg_seller
     }
-    console.log(userr)
     res.setHeader('Cache-Control', 'no-store, no-cache, private');
     res.status(200).json(userr);
   } catch (error) {
@@ -172,7 +171,6 @@ export const EditUser: RequestHandler<
   if(!username){
     throw createHttpError(404, "no username")
   }
-  console.log(username)
   try {
     const user = await UserModel.findOne({_id:req.session.userID}).exec()
     if(!user){
@@ -183,7 +181,6 @@ export const EditUser: RequestHandler<
       username: username,
       reg_seller: user.reg_seller,
     };
-    console.log(UserResponse)
     await user.save()
     req.session.userID = user._id;
     res.setHeader('Cache-Control', 'no-store, no-cache, private');
