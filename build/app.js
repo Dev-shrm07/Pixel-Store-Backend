@@ -28,7 +28,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const validateENV_1 = __importDefault(require("./utils/validateENV"));
-const cors_1 = __importDefault(require("cors"));
 const auth_1 = require("./middlewares/auth");
 const morgan_1 = __importDefault(require("morgan"));
 const http_errors_1 = __importStar(require("http-errors"));
@@ -57,11 +56,13 @@ app.use((0, express_session_1.default)({
         mongoUrl: validateENV_1.default.MONGO_CONNECTION_STRING,
     }),
 }));
-app.use((0, cors_1.default)({
-    origin: "https://pixelstoreindx.netlify.app/",
-    //origin: ["/","http://localhost:3000"],
-    credentials: true,
-}));
+// app.use(
+//   cors({
+//     origin:"https://pixelstoreindx.netlify.app/",
+//     //origin: ["/","http://localhost:3000"],
+//     credentials: true,
+//   })
+// );
 app.use((0, morgan_1.default)("dev"));
 app.use("/api/payments", payments_1.default);
 app.use(body_parser_1.default.json({ limit: "500mb" }));
