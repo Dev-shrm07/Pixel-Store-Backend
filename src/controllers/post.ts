@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import { assertIsDefined } from "../utils/assertisDefined";
 import createHttpError from "http-errors";
 import UserModel from "../models/user";
+import stripe from "../utils/stripe";
+import ProductModel from "../models/Product"
 
 export const getPosts: RequestHandler = async (req, res, next) => {
   try {
@@ -26,6 +28,7 @@ export const getPostByID: RequestHandler = async (req, res, next) => {
   try {
     if (!mongoose.isValidObjectId(id)) {
       throw createHttpError(404, "Not a valid id");
+      return
     }
     const post = await PostModel.find(
       { _id: id },
@@ -33,6 +36,7 @@ export const getPostByID: RequestHandler = async (req, res, next) => {
     ).exec();
     if (!post) {
       throw createHttpError(404, "Post Not found");
+      return
     }
     res.setHeader('Cache-Control', 'no-store, no-cache, private');
 
@@ -119,7 +123,22 @@ export const createPost: RequestHandler<
       description: description,
       creator: userid,
     });
-
+    const product = await stripe.products.create({
+      name: title,
+      description: description,
+    });
+    const prod_id = product.id
+    const price_prod = await stripe.prices.create({
+      product: product.id,
+      unit_amount: price*100, 
+      currency: 'inr',
+    });
+    const price_id = price_prod.id
+    const Product = await ProductModel.create({
+      post:post._id,
+      price:price_id,
+      product_id:prod_id
+    })
     const postResponse: postresponse = {
       _id: post._id,
       image_watermark: post.image_watermark,
@@ -145,17 +164,28 @@ export const deletePost: RequestHandler = async (req, res, next) => {
     assertIsDefined(userid);
     if (!mongoose.isValidObjectId(id)) {
       throw createHttpError(404, "Not a valid post i");
+      return
     }
     const post = await PostModel.findOne({ _id: id }).exec();
     if (!post) {
       throw createHttpError(404, "Post not Found");
+      return
     }
     const postcreator = post.creator;
     assertIsDefined(postcreator);
     if (!postcreator.equals(userid)) {
       throw createHttpError(401, "User not allowed");
+      return
+    }
+    const Product = await ProductModel.findOne({post:id}).exec()
+    if(Product){
+      const del1 = await stripe.products.del(Product.product_id!)
+      await stripe.prices.update(Product.price_id!, {
+        active: false,
+      });
     }
     await PostModel.deleteOne({ _id: id });
+    
     res.setHeader('Cache-Control', 'no-store, no-cache, private');
 
     res.sendStatus(204);
@@ -230,6 +260,24 @@ export const updatePost: RequestHandler<
       post.category = req.body.category
     }
     await post.save()
+    const Product = await ProductModel.findOne({post:post._id}).exec()
+    if(!Product || !Product.price_id){
+      throw createHttpError(404, "Please create the Post again")
+    }
+    let p = Product.price_id
+    if(typeof post.price!='undefined'){
+      const pricex = await stripe.prices.create({
+        unit_amount:post.price*100,
+        currency:'inr',
+        product:Product.product_id
+      })
+      await stripe.prices.update(p, {
+        active: false,
+      });
+      p = pricex.id
+    }
+    Product.price_id=p
+    await Product.save()
     const response:postresponse={
       _id:post._id,
       image_watermark:post.image_watermark,
@@ -242,6 +290,7 @@ export const updatePost: RequestHandler<
 
 
     }
+    
     res.setHeader('Cache-Control', 'no-store, no-cache, private');
     res.status(200).json(response)
     return
@@ -267,15 +316,18 @@ export const savePost: RequestHandler<
     const User = await UserModel.findById(authUser).exec();
     if (!User) {
       throw createHttpError(404, "invalid request");
+      return
     }
     const post = await PostModel.findById(postId).exec();
     if (!post) {
       throw createHttpError(401, "No post found");
+      return
     }
     const saveresponse: mongoose.Types.ObjectId = postId;
     const arr = User.savedPosts;
     if(arr.includes(saveresponse)){
       throw createHttpError(401, "Already saved")
+      return
     }
     arr.push(saveresponse);
     const Userssaved = await User.save();
@@ -294,6 +346,7 @@ export const getSavedPosts: RequestHandler = async (req, res, next) => {
     const User = await UserModel.findOne({ _id: authuser }).exec();
     if (!User) {
       throw createHttpError(404, "User not found");
+      return
     }
     const arr = User.savedPosts;
     const result: postresponse[] = [];
