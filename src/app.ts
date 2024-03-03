@@ -39,7 +39,8 @@ app.use(
 
 app.use(
   cors({
-    origin: ["https://pixelstoreind.netlify.app/","http://localhost:3000"],
+    origin:"https://pixelstoreindx.netlify.app/",
+    //origin: ["https://pixelstoreind.netlify.app/","http://localhost:3000"],
     credentials: true,
   })
 );
