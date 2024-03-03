@@ -38,6 +38,7 @@ const welcome_1 = __importDefault(require("./routes/welcome"));
 const user_1 = __importDefault(require("./routes/user"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const express_session_1 = __importDefault(require("express-session"));
+require("dotenv/config");
 const connect_mongo_1 = __importDefault(require("connect-mongo"));
 const app = (0, express_1.default)();
 app.set("trust proxy", 1);
@@ -57,8 +58,8 @@ app.use((0, express_session_1.default)({
     }),
 }));
 app.use((0, cors_1.default)({
-    origin: "*",
-    //origin: ["https://pixelstoreind.netlify.app/","http://localhost:3000"],
+    origin: "https://pixelstoreindx.netlify.app/",
+    //origin: ["/","http://localhost:3000"],
     credentials: true,
 }));
 app.use((0, morgan_1.default)("dev"));
@@ -70,6 +71,13 @@ app.use(body_parser_1.default.urlencoded({
     parameterLimit: 50000,
 }));
 app.use(express_1.default.json());
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'https://pixelstoreindx.netlify.app');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    next();
+});
 app.use("/api/user", user_1.default);
 app.use("/api/posts", auth_1.requireUserAuth, post_1.default);
 app.use("/welcome", welcome_1.default);
