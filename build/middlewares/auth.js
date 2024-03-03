@@ -19,6 +19,7 @@ const requireUserAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         next();
     }
     else {
+        console.log("here");
         next((0, http_errors_1.default)(404, "no valid user"));
     }
 });
