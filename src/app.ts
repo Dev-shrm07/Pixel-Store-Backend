@@ -40,8 +40,8 @@ app.use(
 
 app.use(
   cors({
-    origin:"https://pixelstoreindx.netlify.app/",
-    credentials: true,
+    origin:["https://pixelstoreindx.netlify.app/","http://localhost:3000/"],
+    credentials:true
   })
 );
 
