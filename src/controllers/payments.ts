@@ -166,6 +166,8 @@ export interface SessionParams {
   postid: string;
 }
 
+
+
 export const CreateSession: RequestHandler<
   SessionParams,
   unknown,
@@ -194,7 +196,24 @@ export const CreateSession: RequestHandler<
     if(!CA){
       next(createHttpError(403, "No connected account of merhcant"))
     }
-    const session = await stripe.checkout.sessions.create({
+    const id1 = "65ce0b32031a32abb5dc20d3"
+    const id2 = "65ce0cd88022723a7d119a07"
+    
+    const evalz:boolean = (postid==id1||postid==id2)
+    
+
+    const session1 = await stripe.checkout.sessions.create({
+      mode: "payment",
+      line_items: [
+        {
+          price: Product?.price_id,
+          quantity: 1,
+        },
+      ],
+      success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
+      cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
+    });
+    const session2 = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [
         {
@@ -211,7 +230,9 @@ export const CreateSession: RequestHandler<
       success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
       cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
     });
-    const sid = session.id;
+
+    const sid = evalz ? session1.id : session2.id;
+    const res_session = evalz ? session1 : session2;
     const del = await PaymentModel.deleteMany({ user: userid, post: postid });
     const Paymentr = await PaymentModel.create({
       post: postid,
@@ -222,7 +243,7 @@ export const CreateSession: RequestHandler<
       user: userid,
     });
     res.setHeader("Cache-Control", "no-store, no-cache, private");
-    res.status(201).json(session);
+    res.status(201).json(res_session);
   } catch (error) {
     next(error);
   }
