@@ -190,10 +190,10 @@ export const CreateSession: RequestHandler<
     if (!Product) {
       next(createHttpError(402, "No corresponding product found"));
     }
-    // const CA = await AccountModel.findOne({user:Post?.creator}).exec()
-    // if(!CA){
-    //   next(createHttpError(403, "No connected account of merhcant"))
-    // }
+    const CA = await AccountModel.findOne({user:Post?.creator}).exec()
+    if(!CA){
+      next(createHttpError(403, "No connected account of merhcant"))
+    }
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [
@@ -202,14 +202,14 @@ export const CreateSession: RequestHandler<
           quantity: 1,
         },
       ],
-      // payment_intent_data: {
-      //   application_fee_amount: 10,
-      //   transfer_data: {
-      //     destination: CA?.id,
-      //   },
-      // },
-      success_url: "http://localhost:3000/payment/success/" + postid,
-      cancel_url: "http://localhost:3000/detail/" + postid,
+      payment_intent_data: {
+        application_fee_amount: 0,
+        transfer_data: {
+          destination: CA?.id,
+        },
+      },
+      success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
+      cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
     });
     const sid = session.id;
     const del = await PaymentModel.deleteMany({ user: userid, post: postid });

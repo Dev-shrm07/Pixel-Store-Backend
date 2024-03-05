@@ -33,4 +33,5 @@ router.post("/logout", UserController.Logout);
 router.get("/", auth_1.requireUserAuth, UserController.getauthUser);
 router.patch("/setseller", UserController.setRegSeller);
 router.patch("/editusername", UserController.EditUser);
+router.patch("/password/edit", UserController.EditPassword);
 exports.default = router;

@@ -190,3 +190,38 @@ export const EditUser: RequestHandler<
     next(error);
   }
 };
+
+
+interface changePassword{
+  password:string
+}
+export const EditPassword: RequestHandler<
+  unknown,
+  unknown,
+  changePassword,
+  unknown
+> = async (req, res, next) => {
+  const pass = req.body.password;
+  if(!pass){
+    throw createHttpError(404, "no username")
+  }
+  try {
+    const user = await UserModel.findOne({_id:req.session.userID}).exec()
+    if(!user){
+      throw createHttpError(401, "user not found")
+    }
+    const p = phash.generate(pass)
+    user.password=p
+    const UserResponse: UserResponse = {
+      username: user.username,
+      reg_seller: user.reg_seller,
+    };
+    await user.save()
+    req.session.userID = user._id;
+    res.setHeader('Cache-Control', 'no-store, no-cache, private');
+
+    res.status(200).json(UserResponse);
+  } catch (error) {
+    next(error);
+  }
+};

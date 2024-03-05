@@ -10,5 +10,6 @@ router.post("/logout", UserController.Logout)
 router.get("/", requireUserAuth, UserController.getauthUser)
 router.patch("/setseller",UserController.setRegSeller )
 router.patch("/editusername",UserController.EditUser)
+router.patch("/password/edit", UserController.EditPassword)
 
 export default router

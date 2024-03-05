@@ -188,10 +188,10 @@ const CreateSession = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         if (!Product) {
             next((0, http_errors_1.default)(402, "No corresponding product found"));
         }
-        // const CA = await AccountModel.findOne({user:Post?.creator}).exec()
-        // if(!CA){
-        //   next(createHttpError(403, "No connected account of merhcant"))
-        // }
+        const CA = yield ConnectedAccount_1.default.findOne({ user: Post === null || Post === void 0 ? void 0 : Post.creator }).exec();
+        if (!CA) {
+            next((0, http_errors_1.default)(403, "No connected account of merhcant"));
+        }
         const session = yield stripe_1.default.checkout.sessions.create({
             mode: "payment",
             line_items: [
@@ -200,14 +200,14 @@ const CreateSession = (req, res, next) => __awaiter(void 0, void 0, void 0, func
                     quantity: 1,
                 },
             ],
-            // payment_intent_data: {
-            //   application_fee_amount: 10,
-            //   transfer_data: {
-            //     destination: CA?.id,
-            //   },
-            // },
-            success_url: "http://localhost:3000/payment/success/" + postid,
-            cancel_url: "http://localhost:3000/detail/" + postid,
+            payment_intent_data: {
+                application_fee_amount: 0,
+                transfer_data: {
+                    destination: CA === null || CA === void 0 ? void 0 : CA.id,
+                },
+            },
+            success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
+            cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
         });
         const sid = session.id;
         const del = yield Payment_1.default.deleteMany({ user: userid, post: postid });

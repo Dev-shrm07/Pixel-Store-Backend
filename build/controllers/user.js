@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EditUser = exports.setRegSeller = exports.Logout = exports.Login = exports.Signup = exports.getauthUser = void 0;
+exports.EditPassword = exports.EditUser = exports.setRegSeller = exports.Logout = exports.Login = exports.Signup = exports.getauthUser = void 0;
 const user_1 = __importDefault(require("../models/user"));
 const http_errors_1 = __importDefault(require("http-errors"));
 const password_hash_1 = __importDefault(require("password-hash"));
@@ -169,3 +169,29 @@ const EditUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.EditUser = EditUser;
+const EditPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const pass = req.body.password;
+    if (!pass) {
+        throw (0, http_errors_1.default)(404, "no username");
+    }
+    try {
+        const user = yield user_1.default.findOne({ _id: req.session.userID }).exec();
+        if (!user) {
+            throw (0, http_errors_1.default)(401, "user not found");
+        }
+        const p = password_hash_1.default.generate(pass);
+        user.password = p;
+        const UserResponse = {
+            username: user.username,
+            reg_seller: user.reg_seller,
+        };
+        yield user.save();
+        req.session.userID = user._id;
+        res.setHeader('Cache-Control', 'no-store, no-cache, private');
+        res.status(200).json(UserResponse);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.EditPassword = EditPassword;
