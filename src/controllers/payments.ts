@@ -201,38 +201,42 @@ export const CreateSession: RequestHandler<
     
     const evalz:boolean = (postid==id1||postid==id2)
     
+    let session;
+    if(evalz){
+      session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        line_items: [
+          {
+            price: Product?.price_id,
+            quantity: 1,
+          },
+        ],
+        success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
+        cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
+      });
+    }else{
+      session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        line_items: [
+          {
+            price: Product?.price_id,
+            quantity: 1,
+          },
+        ],
+        payment_intent_data: {
+          application_fee_amount: 0,
+          transfer_data: {
+            destination: CA?.id,
+          },
+        },
+        success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
+        cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
+      });
+    }
+    
+    
 
-    const session1 = await stripe.checkout.sessions.create({
-      mode: "payment",
-      line_items: [
-        {
-          price: Product?.price_id,
-          quantity: 1,
-        },
-      ],
-      success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
-      cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
-    });
-    const session2 = await stripe.checkout.sessions.create({
-      mode: "payment",
-      line_items: [
-        {
-          price: Product?.price_id,
-          quantity: 1,
-        },
-      ],
-      payment_intent_data: {
-        application_fee_amount: 0,
-        transfer_data: {
-          destination: CA?.id,
-        },
-      },
-      success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
-      cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
-    });
-
-    const sid = evalz ? session1.id : session2.id;
-    const res_session = evalz ? session1 : session2;
+    const sid = session.id;
     const del = await PaymentModel.deleteMany({ user: userid, post: postid });
     const Paymentr = await PaymentModel.create({
       post: postid,
@@ -243,7 +247,7 @@ export const CreateSession: RequestHandler<
       user: userid,
     });
     res.setHeader("Cache-Control", "no-store, no-cache, private");
-    res.status(201).json(res_session);
+    res.status(201).json(session);
   } catch (error) {
     next(error);
   }

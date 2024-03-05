@@ -195,36 +195,40 @@ const CreateSession = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         const id1 = "65ce0b32031a32abb5dc20d3";
         const id2 = "65ce0cd88022723a7d119a07";
         const evalz = (postid == id1 || postid == id2);
-        const session1 = yield stripe_1.default.checkout.sessions.create({
-            mode: "payment",
-            line_items: [
-                {
-                    price: Product === null || Product === void 0 ? void 0 : Product.price_id,
-                    quantity: 1,
+        let session;
+        if (evalz) {
+            session = yield stripe_1.default.checkout.sessions.create({
+                mode: "payment",
+                line_items: [
+                    {
+                        price: Product === null || Product === void 0 ? void 0 : Product.price_id,
+                        quantity: 1,
+                    },
+                ],
+                success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
+                cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
+            });
+        }
+        else {
+            session = yield stripe_1.default.checkout.sessions.create({
+                mode: "payment",
+                line_items: [
+                    {
+                        price: Product === null || Product === void 0 ? void 0 : Product.price_id,
+                        quantity: 1,
+                    },
+                ],
+                payment_intent_data: {
+                    application_fee_amount: 0,
+                    transfer_data: {
+                        destination: CA === null || CA === void 0 ? void 0 : CA.id,
+                    },
                 },
-            ],
-            success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
-            cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
-        });
-        const session2 = yield stripe_1.default.checkout.sessions.create({
-            mode: "payment",
-            line_items: [
-                {
-                    price: Product === null || Product === void 0 ? void 0 : Product.price_id,
-                    quantity: 1,
-                },
-            ],
-            payment_intent_data: {
-                application_fee_amount: 0,
-                transfer_data: {
-                    destination: CA === null || CA === void 0 ? void 0 : CA.id,
-                },
-            },
-            success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
-            cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
-        });
-        const sid = evalz ? session1.id : session2.id;
-        const res_session = evalz ? session1 : session2;
+                success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
+                cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
+            });
+        }
+        const sid = session.id;
         const del = yield Payment_1.default.deleteMany({ user: userid, post: postid });
         const Paymentr = yield Payment_1.default.create({
             post: postid,
@@ -235,7 +239,7 @@ const CreateSession = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             user: userid,
         });
         res.setHeader("Cache-Control", "no-store, no-cache, private");
-        res.status(201).json(res_session);
+        res.status(201).json(session);
     }
     catch (error) {
         next(error);
