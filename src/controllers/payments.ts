@@ -211,8 +211,8 @@ export const CreateSession: RequestHandler<
             quantity: 1,
           },
         ],
-        success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
-        cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
+        success_url: "http://localhost:3000/payment/success/" + postid,
+        cancel_url: "http://localhost:3000/detail/" + postid,
       });
     }else{
       session = await stripe.checkout.sessions.create({
