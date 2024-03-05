@@ -107,6 +107,7 @@ export const HandlWebhooks: RequestHandler = async (req, res, next) => {
       const Paymenty = await PaymentModel.findOne({ session_id: sid }).exec();
       if (!Paymenty) {
         throw createHttpError(404, "INvalid");
+        return
       }
       if (Paymenty) {
         Paymenty.completed = true;

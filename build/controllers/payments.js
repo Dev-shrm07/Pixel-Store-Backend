@@ -117,6 +117,7 @@ const HandlWebhooks = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             const Paymenty = yield Payment_1.default.findOne({ session_id: sid }).exec();
             if (!Paymenty) {
                 throw (0, http_errors_1.default)(404, "INvalid");
+                return;
             }
             if (Paymenty) {
                 Paymenty.completed = true;
