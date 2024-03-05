@@ -81,6 +81,7 @@ const HandlWebhooks = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             const Model = yield ConnectedAccount_1.default.findOne({ id: id }).exec();
             if (!Model) {
                 throw (0, http_errors_1.default)(401, "No account found");
+                return;
             }
             const valid_details = event.data.object.details_submitted;
             const payouts = event.data.object.payouts_enabled;
@@ -100,7 +101,8 @@ const HandlWebhooks = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             const cid = event.data.object.id;
             const Paymentx = yield Payment_1.default.findOne({ session_id: cid }).exec();
             if (!Paymentx) {
-                next((0, http_errors_1.default)(404, "INvalid"));
+                throw (0, http_errors_1.default)(404, "INvalid");
+                return;
             }
             if (Paymentx) {
                 Paymentx.completed = true;
@@ -109,27 +111,30 @@ const HandlWebhooks = (req, res, next) => __awaiter(void 0, void 0, void 0, func
                 Paymentx.success = true;
             }
             yield (Paymentx === null || Paymentx === void 0 ? void 0 : Paymentx.save());
+            break;
         case "checkout.session.async_payment_succeeded":
             const sid = event.data.object.id;
             const Paymenty = yield Payment_1.default.findOne({ session_id: sid }).exec();
             if (!Paymenty) {
-                next((0, http_errors_1.default)(404, "INvalid"));
+                throw (0, http_errors_1.default)(404, "INvalid");
             }
             if (Paymenty) {
                 Paymenty.completed = true;
                 Paymenty.success = true;
             }
             yield (Paymenty === null || Paymenty === void 0 ? void 0 : Paymenty.save());
+            break;
         case "checkout.session.async_payment_failed":
             const siid = event.data.object.id;
             const Paymentz = yield Payment_1.default.findOne({ session_id: siid }).exec();
             if (!Paymentz) {
-                next((0, http_errors_1.default)(404, "INvalid"));
+                throw (0, http_errors_1.default)(404, "INvalid");
             }
             if (Paymentz) {
                 Paymentz.fail = false;
             }
             yield (Paymentz === null || Paymentz === void 0 ? void 0 : Paymentz.save());
+            break;
         default:
             console.log(`Unhandled event type ${event === null || event === void 0 ? void 0 : event.type}.`);
     }

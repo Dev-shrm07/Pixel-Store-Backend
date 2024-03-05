@@ -69,6 +69,7 @@ export const HandlWebhooks: RequestHandler = async (req, res, next) => {
 
       if (!Model) {
         throw createHttpError(401, "No account found");
+        return
       }
       const valid_details = event.data.object.details_submitted;
       const payouts = event.data.object.payouts_enabled;
@@ -89,7 +90,8 @@ export const HandlWebhooks: RequestHandler = async (req, res, next) => {
       const cid = event.data.object.id;
       const Paymentx = await PaymentModel.findOne({ session_id: cid }).exec();
       if (!Paymentx) {
-        next(createHttpError(404, "INvalid"));
+        throw createHttpError(404, "INvalid");
+        return
       }
       if (Paymentx) {
         Paymentx.completed = true;
@@ -99,11 +101,12 @@ export const HandlWebhooks: RequestHandler = async (req, res, next) => {
       }
 
       await Paymentx?.save();
+      break
     case "checkout.session.async_payment_succeeded":
       const sid = event.data.object.id;
       const Paymenty = await PaymentModel.findOne({ session_id: sid }).exec();
       if (!Paymenty) {
-        next(createHttpError(404, "INvalid"));
+        throw createHttpError(404, "INvalid");
       }
       if (Paymenty) {
         Paymenty.completed = true;
@@ -111,17 +114,19 @@ export const HandlWebhooks: RequestHandler = async (req, res, next) => {
       }
 
       await Paymenty?.save();
+      break
 
     case "checkout.session.async_payment_failed":
       const siid = event.data.object.id;
       const Paymentz = await PaymentModel.findOne({ session_id: siid }).exec();
       if (!Paymentz) {
-        next(createHttpError(404, "INvalid"));
+        throw createHttpError(404, "INvalid");
       }
       if (Paymentz) {
         Paymentz.fail = false;
       }
       await Paymentz?.save();
+      break
 
     default:
       console.log(`Unhandled event type ${event?.type}.`);
