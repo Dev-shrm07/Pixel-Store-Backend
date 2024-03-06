@@ -48,9 +48,9 @@ app.use((0, express_session_1.default)({
     saveUninitialized: false,
     cookie: {
         maxAge: 60 * 60 * 1000,
-        // secure: true,
-        // httpOnly: false,
-        // sameSite: "none",
+        secure: true,
+        httpOnly: false,
+        sameSite: "none",
     },
     rolling: true,
     store: connect_mongo_1.default.create({
