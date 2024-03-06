@@ -60,6 +60,7 @@ export const HandlWebhooks: RequestHandler = async (req, res, next) => {
     console.error("Webhook processing failed:");
     res.setHeader("Cache-Control", "no-store, no-cache, private");
     res.status(500).json({ success: false });
+    return
   }
 
   switch (event?.type) {

@@ -74,6 +74,7 @@ const HandlWebhooks = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         console.error("Webhook processing failed:");
         res.setHeader("Cache-Control", "no-store, no-cache, private");
         res.status(500).json({ success: false });
+        return;
     }
     switch (event === null || event === void 0 ? void 0 : event.type) {
         case "account.updated":
