@@ -62,7 +62,6 @@ export const HandlWebhooks: RequestHandler = async (req, res, next) => {
     res.status(500).json({ success: false });
     return
   }
-
   switch (event?.type) {
     case "account.updated":
       const id = event.data.object.id;
