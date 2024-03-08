@@ -40,7 +40,7 @@ app.use(
 
 app.use(
   cors({
-    origin:["https://pixelstorezy.netlify.app","http://localhost:3000","https://pixelstorezy.vercel.app/"],
+    origin:["https://pixelstorezy.netlify.app","http://localhost:3000","https://pixelstorezy.vercel.app"],
     credentials:true
   })
 );
