@@ -212,8 +212,8 @@ const CreateSession = (req, res, next) => __awaiter(void 0, void 0, void 0, func
                         quantity: 1,
                     },
                 ],
-                success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
-                cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
+                success_url: "https://pixelstorezy.vercel.app/payment/success/" + postid,
+                cancel_url: "https://pixelstorezy.vercel.app/detail/" + postid,
             });
         }
         else {
