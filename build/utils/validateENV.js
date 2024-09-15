@@ -8,5 +8,6 @@ exports.default = (0, envalid_1.cleanEnv)(process.env, {
     STRIPE_PUBLIC_TEST_KEY: (0, validators_1.str)(),
     STRIPE_SECRET_TEST_KEY: (0, validators_1.str)(),
     SESSION_SECRET: (0, validators_1.str)(),
-    STRIPE_WEBHOOK_KEY: (0, validators_1.str)()
+    STRIPE_WEBHOOK_KEY: (0, validators_1.str)(),
+    FRONTEND_URL: (0, validators_1.str)()
 });

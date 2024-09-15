@@ -22,6 +22,8 @@ const validateENV_1 = __importDefault(require("../utils/validateENV"));
 const assertisDefined_1 = require("../utils/assertisDefined");
 const Product_1 = __importDefault(require("../models/Product"));
 const Payment_1 = __importDefault(require("../models/Payment"));
+require("dotenv/config");
+const frontend_url = validateENV_1.default.FRONTEND_URL;
 const RegisterUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userid = req.session.userID;
     (0, assertisDefined_1.assertIsDefined)(userid);
@@ -51,8 +53,8 @@ const RegisterUser = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         }
         const accountLink = yield stripe_1.default.accountLinks.create({
             account: account.id,
-            refresh_url: "http://localhost:3000/register",
-            return_url: `http://localhost:3000/getStatus/${userid}`,
+            refresh_url: frontend_url + "register",
+            return_url: frontend_url + `getStatus/${userid}`,
             type: "account_onboarding",
         });
         res.setHeader("Cache-Control", "no-store, no-cache, private");
@@ -212,8 +214,8 @@ const CreateSession = (req, res, next) => __awaiter(void 0, void 0, void 0, func
                         quantity: 1,
                     },
                 ],
-                success_url: "https://pixelstorezy.vercel.app/payment/success/" + postid,
-                cancel_url: "https://pixelstorezy.vercel.app/detail/" + postid,
+                success_url: frontend_url + "payment/success/" + postid,
+                cancel_url: frontend_url,
             });
         }
         else {
@@ -231,8 +233,8 @@ const CreateSession = (req, res, next) => __awaiter(void 0, void 0, void 0, func
                         destination: CA === null || CA === void 0 ? void 0 : CA.id,
                     },
                 },
-                success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
-                cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
+                success_url: frontend_url + "payment/success/" + postid,
+                cancel_url: frontend_url,
             });
         }
         const sid = session.id;
