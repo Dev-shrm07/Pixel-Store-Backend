@@ -126,6 +126,7 @@ export const createPost: RequestHandler<
     const product = await stripe.products.create({
       name: title,
       description: description,
+      images:[image_watermark]
     });
     const prod_id = product.id
     const price_prod = await stripe.prices.create({

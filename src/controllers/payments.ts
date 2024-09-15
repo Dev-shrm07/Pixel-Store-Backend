@@ -9,6 +9,10 @@ import { trusted } from "mongoose";
 import { assertIsDefined } from "../utils/assertisDefined";
 import ProductModel from "../models/Product";
 import PaymentModel from "../models/Payment";
+import "dotenv/config"
+
+
+const frontend_url = env.FRONTEND_URL
 
 export const RegisterUser: RequestHandler = async (req, res, next) => {
   const userid = req.session.userID;
@@ -39,8 +43,8 @@ export const RegisterUser: RequestHandler = async (req, res, next) => {
     }
     const accountLink = await stripe.accountLinks.create({
       account: account!.id,
-      refresh_url: "http://localhost:3000/register",
-      return_url: `http://localhost:3000/getStatus/${userid}`,
+      refresh_url: frontend_url+"register",
+      return_url: frontend_url+`getStatus/${userid}`,
       type: "account_onboarding",
     });
     res.setHeader("Cache-Control", "no-store, no-cache, private");
@@ -217,8 +221,8 @@ export const CreateSession: RequestHandler<
             quantity: 1,
           },
         ],
-        success_url: "https://pixelstorezy.vercel.app/payment/success/" + postid,
-        cancel_url: "https://pixelstorezy.vercel.app/detail/" + postid,
+        success_url: frontend_url+"payment/success/" + postid,
+        cancel_url: frontend_url,
       });
     }else{
       session = await stripe.checkout.sessions.create({
@@ -235,8 +239,8 @@ export const CreateSession: RequestHandler<
             destination: CA?.id,
           },
         },
-        success_url: "https://pixelstorezy.netlify.app/payment/success/" + postid,
-        cancel_url: "https://pixelstorezy.netlify.app/detail/" + postid,
+        success_url: frontend_url+"payment/success/" + postid,
+        cancel_url:frontend_url,
       });
     }
     

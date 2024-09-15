@@ -7,7 +7,8 @@ export default cleanEnv(process.env, {
     STRIPE_PUBLIC_TEST_KEY:str(),
     STRIPE_SECRET_TEST_KEY:str(),
     SESSION_SECRET:str(),
-    STRIPE_WEBHOOK_KEY:str()
+    STRIPE_WEBHOOK_KEY:str(),
+    FRONTEND_URL:str()
     
     
 })
