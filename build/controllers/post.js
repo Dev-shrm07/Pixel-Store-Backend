@@ -210,7 +210,7 @@ const updatePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             post.image = req.body.image;
             post.image_watermark = req.body.image_watermark;
         }
-        if (req.body.price && req.body.price != 0) {
+        if (req.body.price) {
             post.price = req.body.price;
         }
         if (req.body.title) {
