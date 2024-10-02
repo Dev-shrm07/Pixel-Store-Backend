@@ -105,8 +105,7 @@ const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         });
         const product = yield stripe_1.default.products.create({
             name: title,
-            description: description,
-            images: [image_watermark]
+            description: description
         });
         const prod_id = product.id;
         const price_prod = yield stripe_1.default.prices.create({
