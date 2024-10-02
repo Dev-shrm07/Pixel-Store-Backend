@@ -204,7 +204,7 @@ const CreateSession = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         const id1 = "65ce0b32031a32abb5dc20d3";
         const id2 = "65ce0cd88022723a7d119a07";
         const id3 = "66fd7393aa21b4ba3ada7375";
-        const evalz = (postid == id1 || postid == id2 || postid = id3);
+        const evalz = (postid == id1 || postid == id2 || postid == id3);
         let session;
         if (evalz) {
             session = yield stripe_1.default.checkout.sessions.create({
