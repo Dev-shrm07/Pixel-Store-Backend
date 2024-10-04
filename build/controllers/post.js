@@ -108,6 +108,9 @@ const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             description: description
         });
         const prod_id = product.id;
+        if(!price || price = 0){
+            price = 0
+        }
         const price_prod = yield stripe_1.default.prices.create({
             product: product.id,
             unit_amount: price * 100,
